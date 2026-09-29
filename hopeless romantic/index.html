@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Jodoh - Tes Persentase Jodoh</title>
+    <!-- Tailwind CSS CDN for quick and beautiful UI styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for cute icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti Library for high score celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts: Fredoka & Inter for friendly, rounded typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+         body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #ffe5ec 0%, #ffc2d1 50%, #e8aeef 100%);
+            min-height: 100vh;
+        }
+
+        .font-fredoka {
+            font-family: 'Fredoka', cursive;
+        }
+
+        /* Glassmorphic card effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px rgba(255, 133, 162, 0.25);
+        }
+
+        /* Pulsing heart animation */
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.18); }
+            100% { transform: scale(1); }
+        }
+
+        .animate-heart {
+            animation: heartPulse 1.2s infinite ease-in-out;
+        }
+
+        /* Floating background elements */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(8deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .floating-heart {
+            position: absolute;
+            opacity: 0.15;
+            pointer-events: none;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Custom glow buttons */
+        .btn-pink-glow {
+            background: linear-gradient(135deg, #ff4d6d 0%, #ff758f 100%);
+            box-shadow: 0 8px 25px rgba(255, 77, 109, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-pink-glow:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(255, 77, 109, 0.5);
+        }
+
+        .btn-pink-glow:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Progress bar animation */
+        .progress-bar-fill {
+            transition: width 0.3s ease-out;
+            background: linear-gradient(90deg, #ff758f, #ff4d6d, #c77dff);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 relative overflow-x-hidden min-h-screen">
+
+    <i class="fa-solid fa-heart floating-heart text-pink-500 text-6xl top-10 left-10" style="animation-delay: 0s;"></i>
+    <i class="fa-solid fa-heart floating-heart text-purple-500 text-8xl bottom-12 left-20" style="animation-delay: 1s;"></i>
+    <i class="fa-solid fa-heart floating-heart text-rose-500 text-7xl top-20 right-12" style="animation-delay: 2s;"></i>
+    <i class="fa-solid fa-heart floating-heart text-pink-400 text-5xl bottom-10 right-24" style="animation-delay: 1.5s;"></i>
+
+    <main class="w-full max-w-lg glass-card rounded-3xl p-6 sm:p-8 my-8 relative z-10 text-gray-800">
+        
+        <!-- Header Section -->
+        <header class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-pink-100 text-pink-500 rounded-full mb-3 shadow-inner">
+                <i class="fa-solid fa-heart-pulse text-3xl animate-heart"></i>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-bold font-fredoka text-pink-600 tracking-wide">
+                Tes Persentase Jodoh
+            </h1>
+            <p class="text-sm text-gray-500 mt-2 font-medium">
+                Cek seberapa cocok kamu sama gebetan/pasanganmu 💘 (bukan tarot reader)! 
+            </p>
+        </header>
+
+        <section id="inputSection" class="space-y-4">
+            <!-- Input Nama Cowok -->
+            <div>
+                <label for="maleName" class="block text-sm font-semibold text-gray-700 mb-1">
+                    <i class="fa-solid fa-mars text-blue-500 mr-1"></i> Nama Cowok / Pria
+                </label>
+                <div class="relative">
+                    <input type="text" id="maleName" placeholder="Misal: Ruben Onsu / Mas Gebetan" 
+                        class="w-full px-4 py-3 pl-10 rounded-2xl border-2 border-pink-200 focus:border-pink-500 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400 shadow-sm">
+                    <i class="fa-solid fa-user text-gray-400 absolute left-3.5 top-4"></i>
+                </div>
+            </div>
+
+            <!-- Heart Divider -->
+            <div class="text-center my-1">
+                <span class="bg-pink-100 text-pink-500 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                </span>
+            </div>
+
+            <!-- Input Nama Cewek -->
+            <div>
+                <label for="femaleName" class="block text-sm font-semibold text-gray-700 mb-1">
+                    <i class="fa-solid fa-venus text-pink-500 mr-1"></i> Nama Cewek / Wanita
+                </label>
+                <div class="relative">
+                    <input type="text" id="femaleName" placeholder="Misal: Sarwendah / Mbak Crush" 
+                        class="w-full px-4 py-3 pl-10 rounded-2xl border-2 border-pink-200 focus:border-pink-500 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400 shadow-sm">
+                    <i class="fa-solid fa-user-nurse text-gray-400 absolute left-3.5 top-4"></i>
+                </div>
+            </div>
+
+            <!-- Error Message Banner -->
+            <div id="errorMessage" class="hidden text-red-500 text-xs text-center font-medium bg-red-50 p-2.5 rounded-xl border border-red-200">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i> Isi dulu kedua namamu dan namanya yaa!
+            </div>
+
+            <!-- Action Button -->
+            <button id="calculateBtn" class="w-full py-4 rounded-2xl text-white font-bold font-fredoka text-lg btn-pink-glow mt-4 flex items-center justify-center gap-2 group">
+                <span>Cek Kecocokan Sekarang</span>
+                <i class="fa-solid fa-heart text-xl group-hover:scale-125 transition-transform duration-300"></i>
+            </button>
+        </section>
+
+        <section id="loadingSection" class="hidden text-center py-8 space-y-6">
+            <div class="relative inline-block">
+                <div class="w-20 h-20 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto"></div>
+                <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+            </div>
+            <div>
+                <h3 id="loadingText" class="text-base sm:text-lg font-semibold text-pink-600 h-12 flex items-center justify-center px-2">
+                    Sedang meracik formula cinta...
+                </h3>
+                <p class="text-xs text-gray-400 mt-1">Harap tenang, ini membutuhkan daya analisis tingkat tinggi!</p>
+            </div>
+            <!-- Progress Bar Container -->
+            <div class="w-full bg-pink-100 h-3 rounded-full overflow-hidden p-0.5">
+                <div id="progressBar" class="progress-bar-fill h-full rounded-full w-0"></div>
+            </div>
+        </section>
+
+        <section id="resultSection" class="hidden space-y-6 text-center animate-fade-in">
+            <!-- Names Banner -->
+            <div class="bg-pink-50/80 rounded-2xl p-3 border border-pink-100 flex items-center justify-between text-sm font-bold text-gray-700">
+                <span id="displayMale" class="text-blue-600 truncate max-w-[120px] sm:max-w-[150px]"></span>
+                <i class="fa-solid fa-heart text-pink-500 animate-pulse text-lg"></i>
+                <span id="displayFemale" class="text-pink-600 truncate max-w-[120px] sm:max-w-[150px]"></span>
+            </div>
+
+            <!-- Animated Percentage Display -->
+            <div class="py-2">
+                <div class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-1">Tingkat Kecocokan Kalian</div>
+                <div class="inline-flex items-baseline justify-center font-fredoka text-6xl sm:text-7xl font-bold text-pink-600 tracking-tight">
+                    <span id="percentageScore">0</span>
+                    <span class="text-3xl sm:text-4xl text-pink-400 ml-1">%</span>
+                </div>
+            </div>
+
+            <!-- Level Badge & Commentary -->
+            <div id="resultCard" class="p-5 rounded-2xl border text-left space-y-2 transition-all">
+                <div class="flex items-center gap-2">
+                    <span id="badgeIcon" class="text-xl"></span>
+                    <h2 id="resultTitle" class="font-fredoka text-xl font-bold"></h2>
+                </div>
+                <p id="resultComment" class="text-sm leading-relaxed text-gray-600"></p>
+            </div>
+
+            <!-- Tips Absurd Section -->
+            <div class="bg-purple-50 rounded-2xl p-4 border border-purple-100 text-left">
+                <div class="text-xs font-bold text-purple-600 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i> Tips Hubungan Absurd Hari Ini:
+                </div>
+                <p id="absurdTip" class="text-xs text-purple-900 font-medium italic"></p>
+            </div>
+
+            <!-- Restart Button -->
+            <button id="resetBtn" class="w-full py-3.5 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Coba Pasangan Lain / Cek Lagi</span>
+            </button>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-8 pt-4 border-t border-pink-100/60 text-center text-xs text-gray-400 font-medium">
+            Dibuat buat lucu-lucuan dikala gabut ✨ | Share ke gebetanmu kalau kamu berani!
+        </footer>
+    </main>
+    <script>
+        // DOM Elements
+        const inputSection = document.getElementById('inputSection');
+        const loadingSection = document.getElementById('loadingSection');
+        const resultSection = document.getElementById('resultSection');
+
+        const maleInput = document.getElementById('maleName');
+        const femaleInput = document.getElementById('femaleName');
+        const errorMessage = document.getElementById('errorMessage');
+
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        const loadingText = document.getElementById('loadingText');
+        const progressBar = document.getElementById('progressBar');
+
+        const displayMale = document.getElementById('displayMale');
+        const displayFemale = document.getElementById('displayFemale');
+        const percentageScore = document.getElementById('percentageScore');
+
+        const resultCard = document.getElementById('resultCard');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultComment = document.getElementById('resultComment');
+        const badgeIcon = document.getElementById('badgeIcon');
+        const absurdTip = document.getElementById('absurdTip');
+
+        // Loading status text frames for drama
+        const loadingMessages = [
+            "Sedang mencocokkan zodiak & tanggal lahir...",
+            "Menghitung intensitas gengsi saat mau chat...",
+            "Scanning selera musik & frekuensi kehaluan...",
+            "Memeriksa histori balasan story Instagram...",
+            "Meminta restu dari bintang dan alam semesta..."
+        ];
+
+        // Absurd relationship tips collection
+        const tipsList = [
+            "Kalau gengsi mau chat duluan, coba pura-pura salah kirim stiker kucing lucu.",
+            "Jangan pernah nanya 'kamu mau makan apa?'. Mending langsung pesenin dimsum kesukaannya.",
+            "Sering-sering senyum sendiri pas liat HP, siapa tahu dia ngerasa geer.",
+            "Kalau dia ngirim meme, minimal bales pake stiker 'WKWKWK' atau ketawa 5 baris.",
+            "Sinyal jodoh bakal makin kuat kalau kalian berdua sama-sama belum di-follow back sama mantan.",
+            "Coba cek histori pencarian Spotify-nya, kalau lagu galau semua berarti butuh kamu tuh."
+        ];
+
+        // Calculates a consistent score from 15 to 99 based on input names ASCII sum
+        function calculateDeterministicScore(name1, name2) {
+            const combined = (name1.trim().toLowerCase() + name2.trim().toLowerCase()).replace(/\s+/g, '');
+            if (!combined) return 50;
+
+            let charSum = 0;
+            for (let i = 0; i < combined.length; i++) {
+                charSum += combined.charCodeAt(i) * (i + 1);
+            }
+
+            // Map hash value cleanly to range 15% - 99%
+            const score = (charSum % 85) + 15;
+            return score;
+        }
+
+        calculateBtn.addEventListener('click', () => {
+            const maleVal = maleInput.value.trim();
+            const femaleVal = femaleInput.value.trim();
+
+            if (!maleVal || !femaleVal) {
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            errorMessage.classList.add('hidden');
+            startLoadingProcess(maleVal, femaleVal);
+        });
+
+        // Hide error message on input focus
+        maleInput.addEventListener('input', () => errorMessage.classList.add('hidden'));
+        femaleInput.addEventListener('input', () => errorMessage.classList.add('hidden'));
+
+        // Handle dramatic loading process
+        function startLoadingProcess(male, female) {
+            inputSection.classList.add('hidden');
+            loadingSection.classList.remove('hidden');
+            
+            let progress = 0;
+            let messageIndex = 0;
+            
+            progressBar.style.width = '0%';
+            loadingText.textContent = loadingMessages[0];
+
+            const interval = setInterval(() => {
+                progress += 2;
+                progressBar.style.width = `${progress}%`;
+
+                // Update text periodically
+                if (progress % 20 === 0 && messageIndex < loadingMessages.length - 1) {
+                    messageIndex++;
+                    loadingText.textContent = loadingMessages[messageIndex];
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        showResults(male, female);
+                    }, 400);
+                }
+            }, 50); // Total loading time approx 2.5 seconds
+        }
+
+        function showResults(male, female) {
+            loadingSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+
+            displayMale.textContent = male;
+            displayFemale.textContent = female;
+
+            const finalScore = calculateDeterministicScore(male, female);
+
+            // Animate number count up
+            animateScoreCount(finalScore);
+
+            // Populate category result data
+            populateCategoryData(finalScore);
+
+            // Pick a random absurd tip
+            const randomTip = tipsList[Math.floor(Math.random() * tipsList.length)];
+            absurdTip.textContent = `"${randomTip}"`;
+
+            // Trigger Confetti for high score!
+            if (finalScore >= 80) {
+                triggerConfetti();
+            }
+        }
+
+        function animateScoreCount(target) {
+            let current = 0;
+            percentageScore.textContent = "0";
+
+            const stepTime = Math.max(10, Math.floor(1500 / target));
+            const timer = setInterval(() => {
+                current += 1;
+                percentageScore.textContent = current;
+
+                if (current >= target) {
+                    percentageScore.textContent = target;
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        // Category descriptions and styling assignment
+        function populateCategoryData(score) {
+            // Clear prior styles
+            resultCard.className = "p-5 rounded-2xl border text-left space-y-2 transition-all ";
+
+            if (score >= 85) {
+                badgeIcon.innerHTML = "💍";
+                resultTitle.textContent = "Level: Gass ke KUA!";
+                resultTitle.className = "font-fredoka text-xl font-bold text-emerald-700";
+                resultComment.textContent = "Lucu gini kalau bukan jodoh, terus apa? Sinyal chemistry-nya dapet banget. Tinggal nunggu siapa yang berani confess duluan aja nih!";
+                resultCard.classList.add("bg-emerald-50", "border-emerald-200");
+            } else if (score >= 65) {
+                badgeIcon.innerHTML = "✨";
+                resultTitle.textContent = "Level: Hampir Sempurna, Tapi...";
+                resultTitle.className = "font-fredoka text-xl font-bold text-pink-700";
+                resultComment.textContent = "Waduh, ini mah berpotensi jodoh! Tapi sayang, yang satu gengsian setengah mati, yang satu lagi tipe cuek nggak peka-peka. Coba dikurangin dikit gengsinya biar cepet jadian.";
+                resultCard.classList.add("bg-pink-50", "border-pink-200");
+            } else if (score >= 40) {
+                badgeIcon.innerHTML = "☕";
+                resultTitle.textContent = "Level: Butuh Keajaiban & Kopi";
+                resultTitle.className = "font-fredoka text-xl font-bold text-amber-700";
+                resultComment.textContent = "Kecocokan lumayan ada, tapi sering bingung mau ngobrolin apa. Kalau mau kenal lebih dekat, mending sering-sering ngopi bareng biar obrolannya mengalir deras.";
+                resultCard.classList.add("bg-amber-50", "border-amber-200");
+            } else {
+                badgeIcon.innerHTML = "🤝";
+                resultTitle.textContent = "Level: HTS (Hanya Teman Saja)";
+                resultTitle.className = "font-fredoka text-xl font-bold text-purple-700";
+                resultComment.textContent = "Sinyal jodoh agak redup nih... Sepertinya alam semesta menyarankan kalian jadi 'Just Friend' dulu. Tapi tenang, takdir bisa diubah lewat chat duluan malam ini!";
+                resultCard.classList.add("bg-purple-50", "border-purple-200");
+            }
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#ff4d6d', '#ff758f', '#c77dff', '#ffb3c1']
+                });
+            }
+        }
+
+        // Reset to initial screen
+        resetBtn.addEventListener('click', () => {
+            resultSection.classList.add('hidden');
+            inputSection.classList.remove('hidden');
+            maleInput.value = '';
+            femaleInput.value = '';
+            maleInput.focus();
+        });
+    </script>
+</body>
+</html>
